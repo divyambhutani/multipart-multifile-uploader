@@ -13,9 +13,9 @@ Cannot upload folders within folder and ignores them (logs error)
 First get all dependencies , therefore run command in root of repo
 `go get`
 
-== Edit config.env and enter you credentials like aws_region and aws_bucket_name ==
+**Edit config.env and enter you credentials like aws_region and aws_bucket_name**
 
-Also for aws_session credentials like token,key and access_id , see [aws docs](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html)
+_Also for aws_session credentials like token,key and access_id , see [aws docs](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html)_
 
 Now to run this project use -
 `go run bitbucket.org/divyam_bhutani/fileuploader`
