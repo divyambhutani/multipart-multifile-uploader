@@ -31,7 +31,56 @@ func selectUploader(file *os.File, dirPath string) {
 
 // SelectUploadDir is called when we have to upload a directory
 // it take the pointer to *os.File for that directory and path of directory in our system
-// it reads all file in that directory one by one and starts uploading by calling selectUploader
+// it reads all file in that directory in parallel and starts uploading by calling selectUploader
+func selectUploaderDirParallel(f *os.File, fPath string) {
+	// now we know that this file is dir
+	// we are going to list all files and call selectUploader
+	// on each one by one
+	files, err := f.ReadDir(-1)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fileinfo, _ := f.Stat()
+	dirName := fileinfo.Name()
+
+	wg := &sync.WaitGroup{}
+	ch := make(chan int)
+	wg.Add(len(files))
+	countAtInstant := 0
+
+	// maxCount of files we want to upload at an instant
+	const maxCount = 5
+	for _, file := range files {
+		// if goroutines running at an instant reaches maxCount
+		// wait for one of goroutines to return and decrement countAtInstant by one
+		if countAtInstant >= maxCount {
+			// waits till a goroutine is finished
+			countAtInstant -= (<-ch)
+		}
+		go func(wg *sync.WaitGroup, ch chan int, file fs.DirEntry, dirName string) {
+			defer func() {
+				wg.Done()
+				ch <- 1
+			}()
+			path := fPath + "/" + file.Name()
+			// fmt.Println(path)
+			curFile, _ := os.Open(path)
+			if err != nil {
+				log.Println("Error opening-", path, ". Continuing Forward")
+				return
+			}
+			selectUploader(curFile, dirName+"/")
+			curFile.Close()
+		}(wg, ch, file, dirName)
+		countAtInstant++
+	}
+	// wait for all goroutines to finish
+	wg.Wait()
+}
+
+// this method is similar to selectUploadDirParallel except
+// it uploads file in a directory one at a time
 func selectUploaderDir(f *os.File, fPath string) {
 	// now we know that this file is dir
 	// we are going to list all files and call selectUploader
@@ -55,48 +104,4 @@ func selectUploaderDir(f *os.File, fPath string) {
 		selectUploader(curFile, dirName+"/")
 		curFile.Close()
 	}
-}
-
-func selectUploaderDirSample(f *os.File, fPath string) {
-	// now we know that this file is dir
-	// we are going to list all files and call selectUploader
-	// on each one by one
-	files, err := f.ReadDir(-1)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fileinfo, _ := f.Stat()
-	dirName := fileinfo.Name()
-	// file1 := files[0].Name()
-	// file2 := files[1].Name()
-	// fmt.Println(file1, file2)
-
-	wg := &sync.WaitGroup{}
-	ch := make(chan int)
-	wg.Add(len(files))
-	countAtInstant := 0
-	const maxCount = 5
-	for _, file := range files {
-		if countAtInstant >= maxCount {
-			countAtInstant -= (<-ch)
-		}
-		go func(wg *sync.WaitGroup, ch chan int, file fs.DirEntry, dirName string) {
-			defer func() {
-				wg.Done()
-				ch <- 1
-			}()
-			path := fPath + "/" + file.Name()
-			// fmt.Println(path)
-			curFile, _ := os.Open(path)
-			if err != nil {
-				log.Println("Error opening-", path, ". Continuing Forward")
-				return
-			}
-			selectUploader(curFile, dirName+"/")
-			curFile.Close()
-		}(wg, ch, file, dirName)
-		countAtInstant++
-	}
-	wg.Wait()
 }

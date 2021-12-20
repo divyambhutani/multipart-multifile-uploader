@@ -43,6 +43,40 @@ func main() {
 	}
 }
 
+// selectFile
+func selectFile(fPath string) {
+
+	// open this file
+	f, err := os.Open(fPath)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	defer func() {
+		if err := f.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	fileInfo, err := f.Stat()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if fileInfo.IsDir() {
+		// if file is a directory then upload file by file
+		selectUploaderDirParallel(f, fPath)
+
+	} else {
+		// if it is a single file then just upload
+		selectUploader(f, "")
+	}
+
+}
+
+// USE THIS ONLY IF YOU WANT TO CONVERT THIS PROGRAM TO A LIBRARY
 /*Upload file function no args , you call this function and it will prompt for a path
  -> Instructions :-
  		- you can enter a valid path to a file or folder
@@ -68,37 +102,3 @@ func main() {
 // 		firstTime = false
 // 	}
 // }
-
-// selectFile
-func selectFile(fPath string) {
-
-	// open this file
-	f, err := os.Open(fPath)
-
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	defer func() {
-		if err := f.Close(); err != nil {
-			log.Fatal(err)
-		}
-	}()
-
-	fileInfo, err := f.Stat()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if fileInfo.IsDir() {
-		// if file is a directory then upload file by file
-		selectUploaderDirSample(f, fPath)
-
-	} else {
-		// if it is a single file then just upload
-
-		selectUploader(f, "")
-	}
-
-}
