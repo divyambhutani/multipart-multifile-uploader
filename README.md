@@ -1,4 +1,4 @@
-# fileuploader
+# multipart-multifile-fileuploader
 
 ## Description
 
@@ -18,5 +18,5 @@ First get all dependencies , therefore run command in root of repo
 _Also for aws_session credentials like token,key and access_id , see [aws docs](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html)_
 
 Now to run this project use -
-`go run bitbucket.org/divyam_bhutani/fileuploader`
+`go run github.com/divyambhutani/multipart-multifile-uploader`
 and enter the files you want to upload
