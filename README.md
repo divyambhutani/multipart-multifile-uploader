@@ -20,3 +20,8 @@ _Also for aws_session credentials like token,key and access_id , see [aws docs](
 Now to run this project use -
 `go run github.com/divyambhutani/multipart-multifile-uploader`
 and enter the files you want to upload
+
+
+<img src="img/Screenshot from 2022-03-28 11-52-12.png"  alt="News Screen" width="600"  />
+<img src="img/Screenshot from 2022-03-28 11-54-10.png"  alt="News Screen" width="600"  />
+<img src="img/Screenshot from 2022-03-28 11-56-15.png"  alt="News Screen" width="400"  />
